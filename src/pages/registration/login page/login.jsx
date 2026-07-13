@@ -31,6 +31,7 @@ function Login({ isLogin, setLogin }) {
             setLoading(false);
         }, 2000);
     }
+
     
     return (
         <div className="login-container">

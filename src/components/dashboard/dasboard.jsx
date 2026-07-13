@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import Clock from '../clock/clock';
 import './dasboard.css';
+
 
 function Dashboard() {
   const [totalStudents, setTotalStudents] = useState(252);
@@ -22,10 +24,15 @@ function Dashboard() {
   function increasePendingStudents() {
     setPendingStudents((prev) => prev + 1);
   }
+  useEffect(() => {
+    alert("welcome admin")
+  }, []);
 
   return (
     <div className="dashboard">
       <h1>Welcome Back</h1>
+      <Clock />
+
       <div className="card">
         <h2>{totalStudents}</h2>
         <button type="button" onClick={increaseTotalStudents}>
@@ -33,6 +40,7 @@ function Dashboard() {
         </button>
         <p>Total Students</p>
       </div>
+
       <div className="card">
         <h2>{placedStudents}</h2>
         <button type="button" onClick={increasePlacedStudents}>
