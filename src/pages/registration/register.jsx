@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { STORAGE_KEYS, saveToStorage, readFromStorage } from "../../utils/storage";
 import "./register.css";
 
 function Register({ onStudentRegistered }) {
@@ -77,31 +78,48 @@ function Register({ onStudentRegistered }) {
     if (Object.keys(newErrors).length > 0) {
       return;
     }
-    // Prepare student object (omit password from stored record)
+
+    const existingStudents = readFromStorage(STORAGE_KEYS.STUDENTS, []);
+    const emailExists = existingStudents.some((student) => student.email === formData.email);
+
+    if (emailExists) {
+      setErrors({ email: "This email is already registered." });
+      return;
+    }
+
     const student = {
+      id: Date.now(),
       name: formData.name,
       email: formData.email,
+      password: formData.password,
       roll: formData.roll,
       section: formData.section,
-      age: formData.age,
+      age: Number(formData.age),
       year: formData.year,
-      cgp: formData.cgp,
+      cgp: Number(formData.cgp),
       createdAt: new Date().toISOString(),
     };
 
-    // Read existing students from localStorage and append
     try {
-      const raw = localStorage.getItem('students');
-      const arr = raw ? JSON.parse(raw) : [];
-      arr.push(student);
-      localStorage.setItem('students', JSON.stringify(arr));
-    } catch (e) {
-      console.error('Failed to save student to localStorage', e);
-    }
+      const updatedStudents = [...existingStudents, student];
+      saveToStorage(STORAGE_KEYS.STUDENTS, updatedStudents);
+      saveToStorage(STORAGE_KEYS.IS_LOGIN, true);
+      saveToStorage(STORAGE_KEYS.LOGGED_IN_USER, student.email);
 
-    onStudentRegistered?.(student);
-    handleReset();
-    alert("Registration successful!");
+      // Example localStorage methods
+      localStorage.setItem("student", JSON.stringify(student));
+      const savedStudent = localStorage.getItem("student");
+      console.log("Stored student:", savedStudent);
+      localStorage.removeItem("student");
+      localStorage.clear();
+
+      onStudentRegistered?.(student);
+      handleReset();
+      alert("Registration successful!");
+    } catch (error) {
+      console.error("Failed to save student:", error);
+      alert("Something went wrong while saving data.");
+    }
   };
 
   const handleReset = () => {
@@ -121,111 +139,53 @@ function Register({ onStudentRegistered }) {
   return (
     <section className="register-section">
       <h2>Student Registration</h2>
-        <form className="register-form" onSubmit={handleSubmit} noValidate>
-          <div className="form-group">
+      <form className="register-form" onSubmit={handleSubmit} noValidate>
+        <div className="form-group">
           <label htmlFor="name">Name</label>
-          <input
-            id="name"
-            name="name"
-            type="text"
-            placeholder="Enter name"
-            value={formData.name}
-            onChange={handleChange}
-          />
+          <input id="name" name="name" type="text" placeholder="Enter name" value={formData.name} onChange={handleChange} />
           {errors.name && <small className="error-message">{errors.name}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            placeholder="Enter email"
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <input id="email" name="email" type="email" placeholder="Enter email" value={formData.email} onChange={handleChange} />
           {errors.email && <small className="error-message">{errors.email}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            placeholder="Enter password"
-            value={formData.password}
-            onChange={handleChange}
-          />
+          <input id="password" name="password" type="password" placeholder="Enter password" value={formData.password} onChange={handleChange} />
           {errors.password && <small className="error-message">{errors.password}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="roll">Roll Number</label>
-          <input
-            id="roll"
-            name="roll"
-            type="text"
-            placeholder="Enter roll number"
-            value={formData.roll}
-            onChange={handleChange}
-          />
+          <input id="roll" name="roll" type="text" placeholder="Enter roll number" value={formData.roll} onChange={handleChange} />
           {errors.roll && <small className="error-message">{errors.roll}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="section">Section</label>
-          <input
-            id="section"
-            name="section"
-            type="text"
-            placeholder="Enter section"
-            value={formData.section}
-            onChange={handleChange}
-          />
+          <input id="section" name="section" type="text" placeholder="Enter section" value={formData.section} onChange={handleChange} />
           {errors.section && <small className="error-message">{errors.section}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="age">Age</label>
-          <input
-            id="age"
-            name="age"
-            type="number"
-            placeholder="Enter age"
-            value={formData.age}
-            onChange={handleChange}
-          />
+          <input id="age" name="age" type="number" placeholder="Enter age" value={formData.age} onChange={handleChange} />
           {errors.age && <small className="error-message">{errors.age}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="year">Year</label>
-          <input
-            id="year"
-            name="year"
-            type="text"
-            placeholder="Enter year"
-            value={formData.year}
-            onChange={handleChange}
-          />
+          <input id="year" name="year" type="text" placeholder="Enter year" value={formData.year} onChange={handleChange} />
           {errors.year && <small className="error-message">{errors.year}</small>}
         </div>
         <div className="form-group">
           <label htmlFor="cgp">CGPA</label>
-          <input
-            id="cgp"
-            name="cgp"
-            type="text"
-            placeholder="Enter CGPA"
-            value={formData.cgp}
-            onChange={handleChange}
-          />
+          <input id="cgp" name="cgp" type="text" placeholder="Enter CGPA" value={formData.cgp} onChange={handleChange} />
           {errors.cgp && <small className="error-message">{errors.cgp}</small>}
         </div>
-          <button type="submit" className="button-primary">Register Student</button>
-        </form>
-        <button type="button" className="back-button" onClick={handleReset}>
-          Reset Form
-        </button>
-        <p>
-          Already have an account? <Link to="/login">Login here</Link>
-        </p>
+        <button type="submit" className="button-primary">Register Student</button>
+      </form>
+      <button type="button" className="back-button" onClick={handleReset}>Reset Form</button>
+      <p>
+        Already have an account? <Link to="/login">Login here</Link>
+      </p>
     </section>
   );
 }

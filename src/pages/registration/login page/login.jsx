@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { STORAGE_KEYS, saveToStorage, readFromStorage, removeFromStorage } from "../../../utils/storage";
 import "./login.css";
 
 function Login({ isLogin, setLogin }) {
@@ -12,27 +13,62 @@ function Login({ isLogin, setLogin }) {
 
     const navigate = useNavigate();
 
+    const [storedStudents, setStoredStudents] = useState(() => readFromStorage(STORAGE_KEYS.STUDENTS, []));
+
+    useEffect(() => {
+        // keep stored students in sync on mount
+        setStoredStudents(readFromStorage(STORAGE_KEYS.STUDENTS, []));
+    }, []);
+
     function handleLogin(){
+        const normalizedEmail = email.trim().toLowerCase();
+        const normalizedPassword = password.trim();
+
+        if (!normalizedEmail || !normalizedPassword) {
+            setMessage("Please enter your email and password");
+            return;
+        }
+
+        const matchedStudent = Array.isArray(storedStudents)
+            ? storedStudents.find((student) => student.email === normalizedEmail && student.password === normalizedPassword)
+            : null;
+        const isDemoLogin = normalizedEmail === "admin@example.com" && normalizedPassword === "123456789";
+
         setLoading(true);
         setTimeout(() => {
-            if (
-                email === "admin@example.com" &&
-                password === "123456789"
-            ) {
+            if (matchedStudent || isDemoLogin) {
+                const activeUser = matchedStudent?.email || normalizedEmail;
                 setLogin(true);
+                setIsLoggedIn(true);
+                setStoredStudents(readFromStorage(STORAGE_KEYS.STUDENTS, []));
                 try {
-                    localStorage.setItem("isLogin", "true");
+                    saveToStorage(STORAGE_KEYS.IS_LOGIN, true);
+                    saveToStorage(STORAGE_KEYS.LOGGED_IN_USER, activeUser);
                 } catch (e) {}
-                setMessage("Login successful!");
+                setMessage(`Login successful! Welcome ${activeUser}`);
                 navigate("/dashboard");
             } else {
                 setMessage("Invalid email or password");
             }
             setLoading(false);
-        }, 2000);
+        }, 500);
+    }
+    // if(isLoggedIn){
+    //     sessionStorage.setItem(STORAGE_KEYS.IS_LOGIN, "true");
+    //     setLogin(true);
+    //     navigate("/dashboard");
+    // }
+
+    function handleLogout() {
+        setLogin(false);
+        setIsLoggedIn(false);
+        removeFromStorage(STORAGE_KEYS.IS_LOGIN);
+        removeFromStorage(STORAGE_KEYS.LOGGED_IN_USER);
+        setMessage("Logged out successfully");
     }
 
     
+
     return (
         <div className="login-container">
             <div className="login-card">
@@ -65,14 +101,16 @@ function Login({ isLogin, setLogin }) {
                     {showPassword ? "Hide password" : "Show password"}
                 </button>
 
-                <button className="login-btn" onClick={handleLogin} disabled={loading}>
+                <button type="button" className="login-btn" onClick={handleLogin} disabled={loading}>
                     {loading ? "Logging in..." : "Login"}
                 </button>
+
+                {/* storage preview and helpers removed per request */}
 
                 {isLogin ? (
                     <>
                         <p className="welcome-text">Welcome</p>
-                        <button className="login-btn secondary" onClick={() => setLogin(false)}>Logout</button>
+                        <button className="login-btn secondary" onClick={handleLogout}>Logout</button>
                     </>
                 ) : (
                     <>

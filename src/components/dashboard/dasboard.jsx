@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Clock from '../clock/clock';
 import './dasboard.css';
 
@@ -8,6 +9,7 @@ function Dashboard() {
   const [placedStudents, setPlacedStudents] = useState(50);
   const [companies, setCompanies] = useState(33);
   const [pendingStudents, setPendingStudents] = useState(40);
+const navigate = useNavigate();
 
   function increaseTotalStudents() {
     setTotalStudents((prev) => prev + 1);
@@ -27,6 +29,19 @@ function Dashboard() {
   useEffect(() => {
     alert("welcome admin")
   }, []);
+
+  useEffect(() => {
+    const loginStatus = localStorage.getItem("isLogin");
+    if (loginStatus !== "true") {
+      navigate("/login");
+
+       console.log("User is not logged in. Redirecting to login page...");
+
+    }else {
+      console.log("User is logged in.");
+    }
+  }, []);
+
 
   return (
     <div className="dashboard">
