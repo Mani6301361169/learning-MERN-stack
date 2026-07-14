@@ -1,9 +1,13 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { STORAGE_KEYS, saveToStorage, readFromStorage } from "../../utils/storage";
 import "./register.css";
 
 function Register({ onStudentRegistered }) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const editingStudent = location.state?.student || null;
+  const [isEditMode, setIsEditMode] = useState(Boolean(editingStudent));
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -15,6 +19,22 @@ function Register({ onStudentRegistered }) {
     year: "",
   });
   const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    if (editingStudent) {
+      setIsEditMode(true);
+      setFormData({
+        name: editingStudent.name || "",
+        email: editingStudent.email || "",
+        password: editingStudent.password || "",
+        roll: editingStudent.roll || "",
+        section: editingStudent.section || "",
+        age: editingStudent.age ?? editingStudent.cgp ?? "",
+        cgp: editingStudent.cgp ?? "",
+        year: editingStudent.year || "",
+      });
+    }
+  }, [editingStudent]);
 
   const validateField = (name, value) => {
     switch (name) {
@@ -80,15 +100,18 @@ function Register({ onStudentRegistered }) {
     }
 
     const existingStudents = readFromStorage(STORAGE_KEYS.STUDENTS, []);
-    const emailExists = existingStudents.some((student) => student.email === formData.email);
 
-    if (emailExists) {
-      setErrors({ email: "This email is already registered." });
-      return;
+    if (!isEditMode) {
+      const emailExists = existingStudents.some((student) => student.email === formData.email);
+
+      if (emailExists) {
+        setErrors({ email: "This email is already registered." });
+        return;
+      }
     }
 
     const student = {
-      id: Date.now(),
+      id: editingStudent?.id || Date.now(),
       name: formData.name,
       email: formData.email,
       password: formData.password,
@@ -101,21 +124,18 @@ function Register({ onStudentRegistered }) {
     };
 
     try {
-      const updatedStudents = [...existingStudents, student];
+      const updatedStudents = isEditMode
+        ? existingStudents.map((studentItem) => (studentItem.id === editingStudent.id ? student : studentItem))
+        : [...existingStudents, student];
+
       saveToStorage(STORAGE_KEYS.STUDENTS, updatedStudents);
       saveToStorage(STORAGE_KEYS.IS_LOGIN, true);
       saveToStorage(STORAGE_KEYS.LOGGED_IN_USER, student.email);
 
-      // Example localStorage methods
-      localStorage.setItem("student", JSON.stringify(student));
-      const savedStudent = localStorage.getItem("student");
-      console.log("Stored student:", savedStudent);
-      localStorage.removeItem("student");
-      localStorage.clear();
-
       onStudentRegistered?.(student);
       handleReset();
-      alert("Registration successful!");
+      alert(isEditMode ? "Student updated successfully!" : "Registration successful!");
+      navigate("/student");
     } catch (error) {
       console.error("Failed to save student:", error);
       alert("Something went wrong while saving data.");
@@ -134,11 +154,12 @@ function Register({ onStudentRegistered }) {
       year: "",
     });
     setErrors({});
+    setIsEditMode(false);
   };
 
   return (
     <section className="register-section">
-      <h2>Student Registration</h2>
+      <h2>{isEditMode ? "Edit Student" : "Student Registration"}</h2>
       <form className="register-form" onSubmit={handleSubmit} noValidate>
         <div className="form-group">
           <label htmlFor="name">Name</label>
@@ -180,7 +201,7 @@ function Register({ onStudentRegistered }) {
           <input id="cgp" name="cgp" type="text" placeholder="Enter CGPA" value={formData.cgp} onChange={handleChange} />
           {errors.cgp && <small className="error-message">{errors.cgp}</small>}
         </div>
-        <button type="submit" className="button-primary">Register Student</button>
+        <button type="submit" className="button-primary">{isEditMode ? "Save Changes" : "Register Student"}</button>
       </form>
       <button type="button" className="back-button" onClick={handleReset}>Reset Form</button>
       <p>

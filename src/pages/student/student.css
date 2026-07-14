@@ -38,5 +38,17 @@
   cursor: pointer;
 }
 
+.student-actions input {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+}
+
 .btn-delete { background: rgba(255,0,0,0.12); color: var(--text); }
 .btn-view { background: rgba(255,255,255,0.03); color: var(--accent); }
+.btn-edit { background: rgba(255,122,0,0.14); color: var(--accent); }
+.btn-save { background: rgba(0,128,0,0.16); color: var(--text); }
+.btn-cancel { background: rgba(255,255,255,0.04); color: var(--text); }

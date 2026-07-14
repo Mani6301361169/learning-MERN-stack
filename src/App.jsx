@@ -21,6 +21,7 @@ function App() {
       <Route path="/companies" element={<Layout><CompaniesPage /></Layout>} />
       <Route path="/placements" element={<Layout><PlacementsPage /></Layout>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
+      
     </Routes>
   );
 }
