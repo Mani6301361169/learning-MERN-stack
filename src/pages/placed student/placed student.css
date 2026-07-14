@@ -1,0 +1,95 @@
+.placed-student-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.placed-student-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 4px 2px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.status-chip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 122, 0, 0.15);
+  color: var(--accent-2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.placed-student-form {
+  align-items: start;
+}
+
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+  transform: translateY(-1px);
+}
+
+.form-group-full {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.secondary-button {
+  flex: 1;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.secondary-button:hover {
+  background: rgba(255,255,255,0.08);
+}
+
+@media (max-width: 640px) {
+  .placed-student-intro {
+    flex-direction: column;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+}

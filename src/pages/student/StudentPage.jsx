@@ -2,25 +2,21 @@ import '../../App.css';
 import './student.css';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { STORAGE_KEYS, readFromStorage, saveToStorage } from '../../utils/storage';
 
 function StudentPage() {
   const navigate = useNavigate();
   const [students, setStudents] = useState([]);
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('students');
-      const arr = raw ? JSON.parse(raw) : [];
-      setStudents(arr);
-    } catch (e) {
-      console.error('Failed to load students from localStorage', e);
-    }
+    const storedStudents = readFromStorage(STORAGE_KEYS.STUDENTS, []);
+    setStudents(Array.isArray(storedStudents) ? storedStudents : []);
   }, []);
 
   const handleDelete = (studentId) => {
     const copy = students.filter((student) => student.id !== studentId);
     setStudents(copy);
-    localStorage.setItem('students', JSON.stringify(copy));
+    saveToStorage(STORAGE_KEYS.STUDENTS, copy);
   };
 
   const startEdit = (student) => {

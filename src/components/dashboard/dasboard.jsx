@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Clock from '../clock/clock';
-import { STORAGE_KEYS, readFromStorage } from '../../utils/storage';
 import './dasboard.css';
 
 function Dashboard() {
@@ -12,13 +11,11 @@ function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedStudents = readFromStorage(STORAGE_KEYS.STUDENTS, []);
-    const studentCount = Array.isArray(storedStudents) ? storedStudents.length : 0;
-    setTotalStudents(studentCount);
+    setTotalStudents(0);
   }, []);
 
-  function increasePlacedStudents() {
-    setPlacedStudents((prev) => prev + 1);
+  function handleAddPlacedStudent() {
+    navigate('/placed-student');
   }
 
   function increaseCompanies() {
@@ -33,7 +30,7 @@ function Dashboard() {
   // }, []);
 
   useEffect(() => {
-    const loginStatus = readFromStorage(STORAGE_KEYS.IS_LOGIN, false);
+    const loginStatus = true;
     if (!loginStatus) {
       navigate("/login");
       console.log("User is not logged in. Redirecting to login page...");
@@ -45,7 +42,7 @@ function Dashboard() {
   function handleAddStudent() {
     navigate('/register');
   }
-  
+
 
 
   return (
@@ -63,7 +60,7 @@ function Dashboard() {
 
       <div className="card">
         <h2>{placedStudents}</h2>
-        <button type="button" onClick={increasePlacedStudents}>
+        <button type="button" onClick={handleAddPlacedStudent}>
           Add Placed Student
         </button>
         <p>Placed</p>

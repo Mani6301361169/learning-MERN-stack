@@ -6,8 +6,10 @@ import Layout from './components/layouts/layout';
 import StudentPage from './pages/student/StudentPage';
 import CompaniesPage from './pages/companies/CompaniesPage';
 import PlacementsPage from './pages/placements/PlacementsPage';
+import PlacedStudentPage from './pages/placed student/placed student';
 import './App.css';
 import { Routes, Route, Navigate } from 'react-router-dom';
+
 function App() {
   const [isLogin, setLogin] = useState(false);
 
@@ -20,8 +22,9 @@ function App() {
       <Route path="/student" element={<Layout><StudentPage /></Layout>} />
       <Route path="/companies" element={<Layout><CompaniesPage /></Layout>} />
       <Route path="/placements" element={<Layout><PlacementsPage /></Layout>} />
+      <Route path="/placed-student" element={<Layout><PlacedStudentPage /></Layout>} />
       <Route path="*" element={<Navigate to="/login" replace />} />
-      
+
     </Routes>
   );
 }

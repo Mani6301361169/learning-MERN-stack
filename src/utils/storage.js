@@ -1,5 +1,6 @@
 const STORAGE_KEYS = {
   STUDENTS: "students",
+  PLACED_STUDENTS: "placedStudents",
   IS_LOGIN: "isLogin",
   LOGGED_IN_USER: "loggedInUser",
 };
